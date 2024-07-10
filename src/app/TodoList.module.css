@@ -12,12 +12,20 @@
   background-color: #1a1a1a;
   color: white;
   border-radius: 0.5rem;
-  padding: 1.5rem;
-  width: 90%; /* Increased width */
-  max-width: 500px; /* Maximum width */
-  height: 80vh; /* Fixed height */
-  overflow-y: auto; /* Add scrollbar if content exceeds height */
+  width: 90%;
+  max-width: 500px;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.todoListContent {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .todoListHeader {
@@ -81,9 +89,9 @@
 }
 
 .todoList {
-  margin-bottom: 1rem;
-  max-height: 200px;
+  flex-grow: 1;
   overflow-y: auto;
+  margin-bottom: 1rem;
 }
 
 .todoItem {
@@ -118,6 +126,11 @@
 .addTodoSection {
   display: flex;
   gap: 0.5rem;
+  padding: 1rem;
+  background-color: #2a2a2a;
+  border-top: 1px solid #3a3a3a;
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
 }
 
 .addTodoInput {

@@ -90,88 +90,93 @@ const TodoList: React.FC<TodoListProps> = ({ onClose, userName }) => {
   return (
     <div className={styles.todoListContainer}>
       <div className={styles.todoListCard}>
-        <div className={styles.todoListHeader}>
-          <h2 className={styles.todoListTitle}>To-Do List</h2>
-          <button className={styles.closeButton} onClick={onClose}>
-            <X size={20} />
-          </button>
-        </div>
+        <div className={styles.todoListContent}>
+          <div className={styles.todoListHeader}>
+            <h2 className={styles.todoListTitle}>To-Do List</h2>
+            <button className={styles.closeButton} onClick={onClose}>
+              <X size={20} />
+            </button>
+          </div>
 
-        <div className={styles.calendarSection}>
-          <button
-            className={styles.actionButton}
-            onClick={() => changeWeek(-1)}
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <div className={styles.calendarDays}>
-            {getWeekDates().map((date, index) => (
-              <div
-                key={index}
-                className={`${styles.dayColumn} ${
-                  isSelectedDate(date) ? styles.selectedDate : ""
-                }`}
-                onClick={() => setSelectedDate(date)}
-              >
-                <div className={styles.dayName}>
-                  {
-                    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
-                      date.getDay()
-                    ]
-                  }
+          <div className={styles.calendarSection}>
+            <button
+              className={styles.actionButton}
+              onClick={() => changeWeek(-1)}
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div className={styles.calendarDays}>
+              {getWeekDates().map((date, index) => (
+                <div
+                  key={index}
+                  className={`${styles.dayColumn} ${
+                    isSelectedDate(date) ? styles.selectedDate : ""
+                  }`}
+                  onClick={() => setSelectedDate(date)}
+                >
+                  <div className={styles.dayName}>
+                    {
+                      ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+                        date.getDay()
+                      ]
+                    }
+                  </div>
+                  <div className={styles.dateNumber}>{date.getDate()}</div>
                 </div>
-                <div className={styles.dateNumber}>{date.getDate()}</div>
+              ))}
+            </div>
+            <button
+              className={styles.actionButton}
+              onClick={() => changeWeek(1)}
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+
+          <div className={styles.todoList}>
+            {filteredTodos.map((todo) => (
+              <div key={todo.id} className={styles.todoItem}>
+                <div>
+                  <input
+                    type="checkbox"
+                    checked={todo.completed}
+                    onChange={() => toggleTodo(todo.id)}
+                  />
+                  <span
+                    className={`${styles.todoText} ${
+                      todo.completed ? styles.completedTodo : ""
+                    }`}
+                  >
+                    {todo.text}
+                  </span>
+                </div>
+                <div className={styles.todoActions}>
+                  <button className={styles.actionButton}>
+                    <Edit size={16} />
+                  </button>
+                  <button
+                    className={styles.actionButton}
+                    onClick={() => deleteTodo(todo.id)}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
-          <button className={styles.actionButton} onClick={() => changeWeek(1)}>
-            <ChevronRight size={20} />
-          </button>
-        </div>
 
-        <div className={styles.todoList}>
-          {filteredTodos.map((todo) => (
-            <div key={todo.id} className={styles.todoItem}>
-              <div>
-                <input
-                  type="checkbox"
-                  checked={todo.completed}
-                  onChange={() => toggleTodo(todo.id)}
-                />
-                <span
-                  className={`${styles.todoText} ${
-                    todo.completed ? styles.completedTodo : ""
-                  }`}
-                >
-                  {todo.text}
-                </span>
-              </div>
-              <div className={styles.todoActions}>
-                <button className={styles.actionButton}>
-                  <Edit size={16} />
-                </button>
-                <button
-                  className={styles.actionButton}
-                  onClick={() => deleteTodo(todo.id)}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className={styles.addTodoSection}>
-          <input
-            type="text"
-            placeholder="Add a new todo"
-            value={newTodo}
-            onChange={(e) => setNewTodo(e.target.value)}
-            className={styles.addTodoInput}
-          />
-          <button onClick={addTodo} className={styles.addTodoButton}>
-            Add
-          </button>
+          <div className={styles.addTodoSection}>
+            <input
+              type="text"
+              placeholder="Add a new todo"
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+              className={styles.addTodoInput}
+            />
+            <button onClick={addTodo} className={styles.addTodoButton}>
+              Add
+            </button>
+          </div>
         </div>
       </div>
     </div>
