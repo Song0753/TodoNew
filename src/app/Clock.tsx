@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import styles from "./Clock.module.css";
 
 const Clock = () => {
   const [time, setTime] = useState<Date | null>(null);
@@ -25,8 +26,8 @@ const Clock = () => {
   };
 
   return (
-    <div className="w-40 h-40 rounded-full border-4 border-white flex items-center justify-center bg-black bg-opacity-50">
-      <div className="text-2xl font-bold text-white">{formatTime(time)}</div>
+    <div className={styles.clockContainer}>
+      <div className={styles.clockTime}>{formatTime(time)}</div>
     </div>
   );
 };

@@ -34,11 +34,11 @@ const Background = ({ children }: { children: React.ReactNode }) => {
         className="absolute inset-0 bg-black"
         style={{ opacity: overlayOpacity }}
       />
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20">
+      <div className="absolute top-[20%] left-1/2 transform -translate-x-1/2 z-10">
         <Clock />
       </div>
-      <div className="z-10 text-white text-center">{children}</div>
-      <div className="absolute bottom-4 left-4 w-64 z-20">
+      <div className="z-20 text-white text-center">{children}</div>
+      <div className="absolute bottom-4 left-4 w-64 z-30">
         <Slider
           value={[overlayOpacity]}
           min={0}

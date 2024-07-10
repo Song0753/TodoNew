@@ -4,8 +4,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 50;
+  background-color: rgba(0, 0, 0, 0.75); /* Darker background */
+  z-index: 50; /* Increased z-index to be above everything */
 }
 
 .todoListCard {
@@ -13,7 +13,10 @@
   color: white;
   border-radius: 0.5rem;
   padding: 1.5rem;
-  width: 24rem;
+  width: 90%; /* Increased width */
+  max-width: 500px; /* Maximum width */
+  height: 80vh; /* Fixed height */
+  overflow-y: auto; /* Add scrollbar if content exceeds height */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
