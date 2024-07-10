@@ -1,0 +1,140 @@
+.todoListContainer {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+}
+
+.todoListCard {
+  background-color: #1a1a1a;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: 24rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.todoListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.todoListTitle {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.calendarSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendarDays {
+  display: flex;
+  justify-content: space-between;
+  flex-grow: 1;
+  margin: 0 0.5rem;
+}
+
+.dayColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.dayColumn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.selectedDate {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dayName {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.dateNumber {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.todoList {
+  margin-bottom: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.todoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.todoText {
+  margin-left: 0.5rem;
+}
+
+.completedTodo {
+  text-decoration: line-through;
+  color: #888;
+}
+
+.todoActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.addTodoSection {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.addTodoInput {
+  flex-grow: 1;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.addTodoButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  background-color: #4a4a4a;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.addTodoButton:hover {
+  background-color: #5a5a5a;
+}
