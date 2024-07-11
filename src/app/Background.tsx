@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Clock from "./Clock";
 import { Slider } from "@/components/ui/slider";
+import styles from "./Background.module.css";
 
 const backgroundImages = [
   "./backgrounds/image1.jpg",
@@ -13,42 +14,62 @@ const backgroundImages = [
 
 const Background = ({ children }: { children: React.ReactNode }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [nextImageIndex, setNextImageIndex] = useState(1);
   const [overlayOpacity, setOverlayOpacity] = useState(0.2);
 
   useEffect(() => {
+    const preloadImage = (index: number) => {
+      const img = new Image();
+      img.src = backgroundImages[index];
+    };
+
     const interval = setInterval(() => {
-      setCurrentImageIndex(
+      setCurrentImageIndex(nextImageIndex);
+      setNextImageIndex(
         (prevIndex) => (prevIndex + 1) % backgroundImages.length
       );
+      preloadImage((nextImageIndex + 1) % backgroundImages.length);
     }, 5000);
 
+    // Preload the next image
+    preloadImage(nextImageIndex);
+
     return () => clearInterval(interval);
-  }, []);
+  }, [nextImageIndex]);
 
   return (
-    <div
-      className="relative h-screen bg-cover bg-center flex items-center justify-center"
-      style={{ backgroundImage: `url(${backgroundImages[currentImageIndex]})` }}
-    >
+    <div className={styles.backgroundContainer}>
       <div
-        className="absolute inset-0 bg-black"
-        style={{ opacity: overlayOpacity }}
+        className={styles.backgroundImage}
+        style={{
+          backgroundImage: `url(${backgroundImages[currentImageIndex]})`,
+        }}
       />
-      <div className="absolute top-[20%] left-1/2 transform -translate-x-1/2 z-10">
-        <Clock />
-      </div>
-      <div className="z-20 text-white text-center">{children}</div>
-      <div className="absolute bottom-4 left-4 w-64 z-30">
-        <Slider
-          value={[overlayOpacity]}
-          min={0}
-          max={1}
-          step={0.01}
-          onValueChange={([value]) => setOverlayOpacity(value)}
-        />
-        <p className="text-white text-sm mt-2">
-          Overlay Opacity: {Math.round(overlayOpacity * 100)}%
-        </p>
+      <div
+        className={styles.backgroundImage}
+        style={{
+          backgroundImage: `url(${backgroundImages[nextImageIndex]})`,
+          opacity: currentImageIndex === nextImageIndex ? 1 : 0,
+        }}
+      />
+      <div className={styles.overlay} style={{ opacity: overlayOpacity }} />
+      <div className={styles.content}>
+        <div className={styles.clockContainer}>
+          <Clock />
+        </div>
+        <div className={styles.childrenContainer}>{children}</div>
+        <div className={styles.sliderContainer}>
+          <Slider
+            value={[overlayOpacity]}
+            min={0}
+            max={1}
+            step={0.01}
+            onValueChange={([value]) => setOverlayOpacity(value)}
+          />
+          <p className={styles.sliderLabel}>
+            Overlay Opacity: {Math.round(overlayOpacity * 100)}%
+          </p>
+        </div>
       </div>
     </div>
   );

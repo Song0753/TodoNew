@@ -6,6 +6,7 @@ import Background from "./Background";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
+  const [isLoading, setIsLoading] = useState(true);
   const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
   const [userName, setUserName] = useState("");
   const [topPriority, setTopPriority] = useState("");
@@ -19,6 +20,7 @@ export default function Home() {
       setTopPriority(storedPriority);
       setIsOnboardingComplete(true);
     }
+    setIsLoading(false);
   }, []);
 
   const handleOnboardingComplete = (name, priority) => {
@@ -29,6 +31,16 @@ export default function Home() {
     setIsOnboardingComplete(true);
     setShowTodoList(true);
   };
+
+  if (isLoading) {
+    return (
+      <Background>
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+        </div>
+      </Background>
+    );
+  }
 
   if (!isOnboardingComplete) {
     return <OnboardingFlow onComplete={handleOnboardingComplete} />;

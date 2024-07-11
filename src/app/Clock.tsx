@@ -1,28 +1,28 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styles from "./Clock.module.css";
 
 const Clock = () => {
-  const [time, setTime] = useState<Date | null>(null);
+  const [time, setTime] = useState(new Date());
+
+  const updateTime = useCallback(() => {
+    setTime(new Date());
+  }, []);
 
   useEffect(() => {
-    const setCurrentTime = () => setTime(new Date());
-    setCurrentTime(); // Set initial time
-
-    const timer = setInterval(setCurrentTime, 1000);
+    updateTime(); // 컴포넌트 마운트 시 즉시 시간 업데이트
+    const timer = setInterval(updateTime, 60000);
 
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [updateTime]);
 
-  const formatTime = (date: Date | null) => {
-    if (!date) return "00:00:00";
+  const formatTime = (date: Date) => {
     const hours = date.getHours().toString().padStart(2, "0");
     const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-    return `${hours}:${minutes}:${seconds}`;
+    return `${hours}:${minutes}`;
   };
 
   return (
