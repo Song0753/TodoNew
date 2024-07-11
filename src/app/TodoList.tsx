@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
 import styles from "./TodoList.module.css";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Todo {
   id: number;
@@ -139,11 +140,11 @@ const TodoList: React.FC<TodoListProps> = ({ onClose, userName }) => {
           <div className={styles.todoList}>
             {filteredTodos.map((todo) => (
               <div key={todo.id} className={styles.todoItem}>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <input
-                    type="checkbox"
+                <div className={styles.todoItemContent}>
+                  <Checkbox
                     checked={todo.completed}
-                    onChange={() => toggleTodo(todo.id)}
+                    onCheckedChange={() => toggleTodo(todo.id)}
+                    className={`${styles.transparentCheckbox} ${styles.customCheckbox}`}
                   />
                   <span
                     className={`${styles.todoText} ${

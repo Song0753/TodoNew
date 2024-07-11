@@ -116,14 +116,28 @@
   font-size: 1.1rem; /* 전체 폰트 크기 증가 */
 }
 
-.todoItem input[type="checkbox"] {
-  width: 1.2rem; /* 체크박스 크기 증가 */
-  height: 1.2rem; /* 체크박스 크기 증가 */
-  margin-right: 0.75rem; /* 체크박스와 텍스트 사이 간격 */
+.todoItemContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.transparentCheckbox {
+  background-color: transparent !important;
+  border-color: white !important;
+}
+
+.transparentCheckbox[data-state="checked"] {
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 체크마크 색상 변경 */
+.transparentCheckbox[data-state="checked"] svg {
+  color: rgba(255, 255, 255, 0.5) !important; /* 원하는 색상으로 변경 */
 }
 
 .todoText {
-  margin-left: 0.5rem;
   flex-grow: 1; /* 텍스트가 남은 공간을 모두 차지하도록 */
   font-size: 1.1rem; /* 폰트 크기 증가 */
 }
