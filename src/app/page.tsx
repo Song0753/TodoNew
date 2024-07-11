@@ -1,71 +1,64 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import TodoList from "./TodoList";
+import OnboardingFlow from "./Onboarding";
 import Background from "./Background";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function Home() {
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
   const [userName, setUserName] = useState("");
-  const [isNameSet, setIsNameSet] = useState(false);
+  const [topPriority, setTopPriority] = useState("");
   const [showTodoList, setShowTodoList] = useState(false);
 
   useEffect(() => {
-    // Load userName from localStorage
     const storedName = localStorage.getItem("userName");
-    if (storedName) {
+    const storedPriority = localStorage.getItem("topPriority");
+    if (storedName && storedPriority) {
       setUserName(storedName);
-      setIsNameSet(true);
+      setTopPriority(storedPriority);
+      setIsOnboardingComplete(true);
     }
   }, []);
 
-  const handleNameSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (userName.trim() !== "") {
-      localStorage.setItem("userName", userName);
-      setIsNameSet(true);
-    }
+  const handleOnboardingComplete = (name, priority) => {
+    setUserName(name);
+    setTopPriority(priority);
+    localStorage.setItem("userName", name);
+    localStorage.setItem("topPriority", priority);
+    setIsOnboardingComplete(true);
+    setShowTodoList(true);
   };
+
+  if (!isOnboardingComplete) {
+    return <OnboardingFlow onComplete={handleOnboardingComplete} />;
+  }
 
   return (
     <Background>
-      <div className="container mx-auto p-4">
-        {!isNameSet ? (
-          <form onSubmit={handleNameSubmit} className="space-y-4">
-            <Input
-              type="text"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              placeholder="Enter your name"
-              className="w-full bg-white/10 border-white/20 text-white placeholder-white/50"
-            />
-            <Button
-              type="submit"
-              className="bg-white/10 hover:bg-white/20 text-white"
-            >
-              Set Name
-            </Button>
-          </form>
-        ) : (
-          <div className="space-y-4">
-            <h1 className="text-2xl font-bold text-white">
-              Welcome, {userName}!
-            </h1>
-            <Button
-              onClick={() => setShowTodoList(true)}
-              className="bg-white/10 hover:bg-white/20 text-white"
-            >
-              Open Todo List
-            </Button>
-            {showTodoList && (
-              <TodoList
-                onClose={() => setShowTodoList(false)}
-                userName={userName}
-              />
-            )}
+      {showTodoList ? (
+        <TodoList
+          userName={userName}
+          initialTodo={topPriority}
+          onClose={() => setShowTodoList(false)}
+        />
+      ) : (
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-white">
+            Wishing you a delightful day! {userName}
+          </h1>
+          <div className="flex items-center justify-center space-x-2">
+            <input type="checkbox" checked readOnly className="border-white" />
+            <span className="text-white">{topPriority}</span>
           </div>
-        )}
-      </div>
+          <Button
+            onClick={() => setShowTodoList(true)}
+            className="bg-white/10 hover:bg-white/20 text-white"
+          >
+            Open Todo List
+          </Button>
+        </div>
+      )}
     </Background>
   );
 }

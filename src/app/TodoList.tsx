@@ -20,13 +20,32 @@ interface Todo {
 interface TodoListProps {
   onClose: () => void;
   userName: string;
+  initialTodo: string;
 }
 
-const TodoList: React.FC<TodoListProps> = ({ onClose, userName }) => {
+const TodoList: React.FC<TodoListProps> = ({
+  onClose,
+  userName,
+  initialTodo,
+}) => {
   const [todos, setTodos] = useState<Todo[]>(() => {
     // Initialize todos from localStorage
     const storedTodos = localStorage.getItem("todos");
-    return storedTodos ? JSON.parse(storedTodos) : [];
+    if (storedTodos) {
+      return JSON.parse(storedTodos);
+    }
+    // 초기 할 일 추가
+    if (initialTodo) {
+      return [
+        {
+          id: Date.now(),
+          text: initialTodo,
+          completed: false,
+          date: new Date().toISOString().split("T")[0],
+        },
+      ];
+    }
+    return [];
   });
   const [newTodo, setNewTodo] = useState("");
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
