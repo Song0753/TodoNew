@@ -80,7 +80,10 @@ const TodoList: React.FC<TodoListProps> = ({ onClose, userName }) => {
   };
 
   const isSelectedDate = (date: Date) => {
-    return date.toDateString() === selectedDate.toDateString();
+    return (
+      date.toISOString().split("T")[0] ===
+      selectedDate.toISOString().split("T")[0]
+    );
   };
 
   const filteredTodos = todos.filter(
@@ -136,7 +139,7 @@ const TodoList: React.FC<TodoListProps> = ({ onClose, userName }) => {
           <div className={styles.todoList}>
             {filteredTodos.map((todo) => (
               <div key={todo.id} className={styles.todoItem}>
-                <div>
+                <div style={{ display: "flex", alignItems: "center" }}>
                   <input
                     type="checkbox"
                     checked={todo.completed}

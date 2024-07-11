@@ -37,7 +37,6 @@
 
 .todoListTitle {
   font-size: 1.25rem;
-  font-weight: bold;
 }
 
 .closeButton {
@@ -112,12 +111,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0; /* 상하 패딩 증가 */
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.1rem; /* 전체 폰트 크기 증가 */
+}
+
+.todoItem input[type="checkbox"] {
+  width: 1.2rem; /* 체크박스 크기 증가 */
+  height: 1.2rem; /* 체크박스 크기 증가 */
+  margin-right: 0.75rem; /* 체크박스와 텍스트 사이 간격 */
 }
 
 .todoText {
   margin-left: 0.5rem;
+  flex-grow: 1; /* 텍스트가 남은 공간을 모두 차지하도록 */
+  font-size: 1.1rem; /* 폰트 크기 증가 */
 }
 
 .completedTodo {
