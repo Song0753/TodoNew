@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
+import {
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Edit,
+  Trash2,
+  Check,
+} from "lucide-react";
 import styles from "./TodoList.module.css";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -29,6 +36,8 @@ const TodoList: React.FC<TodoListProps> = ({ onClose, userName }) => {
     return new Date(today.setDate(diff));
   });
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editText, setEditText] = useState("");
 
   useEffect(() => {
     // Save todos to localStorage whenever it changes
@@ -56,6 +65,24 @@ const TodoList: React.FC<TodoListProps> = ({ onClose, userName }) => {
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     );
+  };
+  const startEditing = (id: number, text: string) => {
+    setEditingId(id);
+    setEditText(text);
+  };
+
+  const saveEdit = () => {
+    if (editingId === null) return;
+    setTodos(
+      todos.map((todo) =>
+        todo.id === editingId ? { ...todo, text: editText } : todo
+      )
+    );
+    setEditingId(null);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
   };
 
   const deleteTodo = (id: number) => {
@@ -146,24 +173,56 @@ const TodoList: React.FC<TodoListProps> = ({ onClose, userName }) => {
                     onCheckedChange={() => toggleTodo(todo.id)}
                     className={`${styles.transparentCheckbox} ${styles.customCheckbox}`}
                   />
-                  <span
-                    className={`${styles.todoText} ${
-                      todo.completed ? styles.completedTodo : ""
-                    }`}
-                  >
-                    {todo.text}
-                  </span>
+                  {editingId === todo.id ? (
+                    <input
+                      type="text"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className={styles.editInput}
+                      autoFocus
+                    />
+                  ) : (
+                    <span
+                      className={`${styles.todoText} ${
+                        todo.completed ? styles.completedTodo : ""
+                      }`}
+                    >
+                      {todo.text}
+                    </span>
+                  )}
                 </div>
                 <div className={styles.todoActions}>
-                  <button className={styles.actionButton}>
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    className={styles.actionButton}
-                    onClick={() => deleteTodo(todo.id)}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  {editingId === todo.id ? (
+                    <>
+                      <button
+                        className={styles.actionButton}
+                        onClick={saveEdit}
+                      >
+                        <Check size={20} />
+                      </button>
+                      <button
+                        className={styles.actionButton}
+                        onClick={cancelEdit}
+                      >
+                        <X size={20} />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className={styles.actionButton}
+                        onClick={() => startEditing(todo.id, todo.text)}
+                      >
+                        <Edit size={20} />
+                      </button>
+                      <button
+                        className={styles.actionButton}
+                        onClick={() => deleteTodo(todo.id)}
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}

@@ -147,6 +147,20 @@
   color: #888;
 }
 
+.editInput {
+  flex-grow: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.5rem;
+  outline: none;
+}
+
+.editInput:focus {
+  border-bottom-color: white;
+}
 .todoActions {
   display: flex;
   gap: 0.5rem;
