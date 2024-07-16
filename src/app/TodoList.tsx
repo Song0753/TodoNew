@@ -1,4 +1,6 @@
+"use client";
 import React, { useState, useEffect, useCallback } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   X,
   ChevronLeft,
@@ -6,12 +8,13 @@ import {
   Edit,
   Trash2,
   Check,
+  GripVertical,
 } from "lucide-react";
 import styles from "./TodoList.module.css";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface Todo {
-  id: number;
+  id: string;
   text: string;
   completed: boolean;
   date: string;
@@ -38,7 +41,7 @@ const TodoList: React.FC<TodoListProps> = ({
     if (initialTodo) {
       return [
         {
-          id: Date.now(),
+          id: Date.now().toString(),
           text: initialTodo,
           completed: false,
           date: new Date().toISOString().split("T")[0],
@@ -68,7 +71,7 @@ const TodoList: React.FC<TodoListProps> = ({
       setTodos((prevTodos) => [
         ...prevTodos,
         {
-          id: Date.now(),
+          id: Date.now().toString(),
           text: newTodo,
           completed: false,
           date: selectedDate.toISOString().split("T")[0],
@@ -78,14 +81,14 @@ const TodoList: React.FC<TodoListProps> = ({
     }
   }, [newTodo, selectedDate]);
 
-  const toggleTodo = (id: number) => {
+  const toggleTodo = (id: string) => {
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     );
   };
-  const startEditing = (id: number, text: string) => {
+  const startEditing = (id: string, text: string) => {
     setEditingId(id);
     setEditText(text);
   };
@@ -104,7 +107,7 @@ const TodoList: React.FC<TodoListProps> = ({
     setEditingId(null);
   };
 
-  const deleteTodo = (id: number) => {
+  const deleteTodo = (id: string) => {
     setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
   };
 
@@ -136,6 +139,29 @@ const TodoList: React.FC<TodoListProps> = ({
   const filteredTodos = todos.filter(
     (todo) => todo.date === selectedDate.toISOString().split("T")[0]
   );
+
+  const onDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const currentDate = selectedDate.toISOString().split('T')[0];
+    
+    const newTodos = Array.from(todos);
+    const todosForCurrentDate = newTodos.filter(todo => todo.date === currentDate);
+    
+    const [reorderedItem] = todosForCurrentDate.splice(result.source.index, 1);
+    todosForCurrentDate.splice(result.destination.index, 0, reorderedItem);
+    
+    const updatedTodos = newTodos.map(todo => {
+      if (todo.date === currentDate) {
+        return todosForCurrentDate.shift() || todo;
+      }
+      return todo;
+    });
+
+    setTodos(updatedTodos);
+  };
 
   return (
     <div className={styles.todoListContainer}>
@@ -183,69 +209,96 @@ const TodoList: React.FC<TodoListProps> = ({
             </button>
           </div>
 
-          <div className={styles.todoList}>
-            {filteredTodos.map((todo) => (
-              <div key={todo.id} className={styles.todoItem}>
-                <div className={styles.todoItemContent}>
-                  <Checkbox
-                    checked={todo.completed}
-                    onCheckedChange={() => toggleTodo(todo.id)}
-                    className={`${styles.transparentCheckbox} ${styles.customCheckbox}`}
-                  />
-                  {editingId === todo.id ? (
-                    <input
-                      type="text"
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                      className={styles.editInput}
-                      autoFocus
-                    />
-                  ) : (
-                    <span
-                      className={`${styles.todoText} ${
-                        todo.completed ? styles.completedTodo : ""
-                      }`}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="todos">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className={styles.todoList}
+                >
+                  {filteredTodos.map((todo, index) => (
+                    <Draggable
+                      key={todo.id}
+                      draggableId={todo.id}
+                      index={index}
                     >
-                      {todo.text}
-                    </span>
-                  )}
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={styles.todoItem}
+                        >
+                          <div className={styles.dragHandle}>
+                            <GripVertical size={20} />
+                          </div>
+                          <div className={styles.todoItemContent}>
+                            <Checkbox
+                              checked={todo.completed}
+                              onCheckedChange={() => toggleTodo(todo.id)}
+                              className={`${styles.transparentCheckbox} ${styles.customCheckbox}`}
+                            />
+                            {editingId === todo.id ? (
+                              <input
+                                type="text"
+                                value={editText}
+                                onChange={(e) => setEditText(e.target.value)}
+                                className={styles.editInput}
+                                autoFocus
+                              />
+                            ) : (
+                              <span
+                                className={`${styles.todoText} ${
+                                  todo.completed ? styles.completedTodo : ""
+                                }`}
+                              >
+                                {todo.text}
+                              </span>
+                            )}
+                          </div>
+                          <div className={styles.todoActions}>
+                          {editingId === todo.id ? (
+                              <>
+                                <button
+                                  className={styles.actionButton}
+                                  onClick={saveEdit}
+                                >
+                                  <Check size={20} />
+                                </button>
+                                <button
+                                  className={styles.actionButton}
+                                  onClick={cancelEdit}
+                                >
+                                  <X size={20} />
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  className={styles.actionButton}
+                                  onClick={() => startEditing(todo.id, todo.text)}
+                                >
+                                  <Edit size={20} />
+                                </button>
+                                <button
+                                  className={styles.actionButton}
+                                  onClick={() => deleteTodo(todo.id)}
+                                >
+                                  <Trash2 size={20} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
                 </div>
-                <div className={styles.todoActions}>
-                  {editingId === todo.id ? (
-                    <>
-                      <button
-                        className={styles.actionButton}
-                        onClick={saveEdit}
-                      >
-                        <Check size={20} />
-                      </button>
-                      <button
-                        className={styles.actionButton}
-                        onClick={cancelEdit}
-                      >
-                        <X size={20} />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        className={styles.actionButton}
-                        onClick={() => startEditing(todo.id, todo.text)}
-                      >
-                        <Edit size={20} />
-                      </button>
-                      <button
-                        className={styles.actionButton}
-                        onClick={() => deleteTodo(todo.id)}
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </Droppable>
+          </DragDropContext>
 
           <div className={styles.addTodoSection}>
             <input
