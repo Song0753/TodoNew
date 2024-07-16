@@ -31,6 +31,10 @@ export default function Home() {
     setIsOnboardingComplete(true);
     setShowTodoList(true);
   };
+  const handlePriorityTodoChange = (newPriority) => {
+    setTopPriority(newPriority);
+    localStorage.setItem("topPriority", newPriority);
+  };
 
   if (isLoading) {
     return (
@@ -53,6 +57,7 @@ export default function Home() {
           userName={userName}
           initialTodo={topPriority}
           onClose={() => setShowTodoList(false)}
+          onPriorityTodoChange={handlePriorityTodoChange}
         />
       ) : (
         <div className="text-center space-y-4">

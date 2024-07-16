@@ -24,12 +24,14 @@ interface TodoListProps {
   onClose: () => void;
   userName: string;
   initialTodo: string;
+  onPriorityTodoChange: (newPriorityTodo: string) => void;
 }
 
 const TodoList: React.FC<TodoListProps> = ({
   onClose,
   userName,
   initialTodo,
+  onPriorityTodoChange,
 }) => {
   const [todos, setTodos] = useState<Todo[]>(() => {
     // Initialize todos from localStorage
@@ -50,6 +52,25 @@ const TodoList: React.FC<TodoListProps> = ({
     }
     return [];
   });
+  const [priorityTodo, setPriorityTodo] = useState<string>(initialTodo);
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+    updatePriorityTodo();
+
+  }, [todos]);
+  const updatePriorityTodo = () => {
+    const incompleteTodos = todos.filter(todo => !todo.completed);
+    if (incompleteTodos.length > 0) {
+      const newPriorityTodo = incompleteTodos[0].text;
+      setPriorityTodo(newPriorityTodo);
+      onPriorityTodoChange(newPriorityTodo);
+    } else {
+      setPriorityTodo("");
+      onPriorityTodoChange("");
+    }
+  };
+
   const [newTodo, setNewTodo] = useState("");
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
@@ -140,27 +161,17 @@ const TodoList: React.FC<TodoListProps> = ({
     (todo) => todo.date === selectedDate.toISOString().split("T")[0]
   );
 
+
   const onDragEnd = (result) => {
     if (!result.destination) {
       return;
     }
 
-    const currentDate = selectedDate.toISOString().split('T')[0];
-    
     const newTodos = Array.from(todos);
-    const todosForCurrentDate = newTodos.filter(todo => todo.date === currentDate);
-    
-    const [reorderedItem] = todosForCurrentDate.splice(result.source.index, 1);
-    todosForCurrentDate.splice(result.destination.index, 0, reorderedItem);
-    
-    const updatedTodos = newTodos.map(todo => {
-      if (todo.date === currentDate) {
-        return todosForCurrentDate.shift() || todo;
-      }
-      return todo;
-    });
+    const [reorderedItem] = newTodos.splice(result.source.index, 1);
+    newTodos.splice(result.destination.index, 0, reorderedItem);
 
-    setTodos(updatedTodos);
+    setTodos(newTodos);
   };
 
   return (
