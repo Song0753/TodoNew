@@ -6,18 +6,30 @@ import Background from "./Background";
 const WelcomeStep = ({ onNext }) => {
   const [nickname, setNickname] = useState("");
 
+  const handleContinue = () => {
+    if (nickname.trim()) {
+      onNext(nickname);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && nickname.trim()) {
+      handleContinue();
+    }
+  };
   return (
     <div className="space-y-4 text-center">
       <h2 className="text-2xl font-bold text-white">Nice to meet you!</h2>
       <Input
         type="text"
-        placeholder="Enter your name"
+        placeholder="Enter your nickname"
         value={nickname}
         onChange={(e) => setNickname(e.target.value)}
+        onKeyPress={handleKeyPress}
         className="bg-white/10 border-white/20 text-white placeholder-white/50"
       />
       <Button
-        onClick={() => onNext(nickname)}
+        onClick={handleContinue}
         disabled={!nickname}
         className="bg-white/10 hover:bg-white/20 text-white"
       >
@@ -30,6 +42,18 @@ const WelcomeStep = ({ onNext }) => {
 const TodoStep = ({ onNext }) => {
   const [todo, setTodo] = useState("");
 
+  const handleStart = () => {
+    if (todo.trim()) {
+      onNext(todo);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && todo.trim()) {
+      handleStart();
+    }
+  };
+
   return (
     <div className="space-y-4 text-center">
       <h2 className="text-2xl font-bold text-white">
@@ -39,12 +63,13 @@ const TodoStep = ({ onNext }) => {
         type="text"
         placeholder="Enter your top priority"
         value={todo}
+        onKeyPress={handleKeyPress}
         onChange={(e) => setTodo(e.target.value)}
         className="bg-white/10 border-white/20 text-white placeholder-white/50"
       />
       <Button
         onClick={() => onNext(todo)}
-        disabled={!todo}
+        disabled={!todo.trim()}
         className="bg-white/10 hover:bg-white/20 text-white"
       >
         START

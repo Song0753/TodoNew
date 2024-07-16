@@ -57,10 +57,9 @@ const TodoList: React.FC<TodoListProps> = ({
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
     updatePriorityTodo();
-
   }, [todos]);
   const updatePriorityTodo = () => {
-    const incompleteTodos = todos.filter(todo => !todo.completed);
+    const incompleteTodos = todos.filter((todo) => !todo.completed);
     if (incompleteTodos.length > 0) {
       const newPriorityTodo = incompleteTodos[0].text;
       setPriorityTodo(newPriorityTodo);
@@ -101,6 +100,12 @@ const TodoList: React.FC<TodoListProps> = ({
       setNewTodo("");
     }
   }, [newTodo, selectedDate]);
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      addTodo();
+    }
+  };
 
   const toggleTodo = (id: string) => {
     setTodos((prevTodos) =>
@@ -160,7 +165,6 @@ const TodoList: React.FC<TodoListProps> = ({
   const filteredTodos = todos.filter(
     (todo) => todo.date === selectedDate.toISOString().split("T")[0]
   );
-
 
   const onDragEnd = (result) => {
     if (!result.destination) {
@@ -269,7 +273,7 @@ const TodoList: React.FC<TodoListProps> = ({
                             )}
                           </div>
                           <div className={styles.todoActions}>
-                          {editingId === todo.id ? (
+                            {editingId === todo.id ? (
                               <>
                                 <button
                                   className={styles.actionButton}
@@ -288,7 +292,9 @@ const TodoList: React.FC<TodoListProps> = ({
                               <>
                                 <button
                                   className={styles.actionButton}
-                                  onClick={() => startEditing(todo.id, todo.text)}
+                                  onClick={() =>
+                                    startEditing(todo.id, todo.text)
+                                  }
                                 >
                                   <Edit size={20} />
                                 </button>
@@ -317,9 +323,14 @@ const TodoList: React.FC<TodoListProps> = ({
               placeholder="Add a new todo"
               value={newTodo}
               onChange={(e) => setNewTodo(e.target.value)}
+              onKeyPress={handleKeyPress}
               className={styles.addTodoInput}
             />
-            <button onClick={addTodo} className={styles.addTodoButton}>
+            <button
+              onClick={addTodo}
+              className={styles.addTodoButton}
+              disabled={!newTodo.trim()}
+            >
               Add
             </button>
           </div>
