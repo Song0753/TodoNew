@@ -54,21 +54,26 @@ const TodoList: React.FC<TodoListProps> = ({
   });
   const [priorityTodo, setPriorityTodo] = useState<string>(initialTodo);
 
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-    updatePriorityTodo();
-  }, [todos]);
-  const updatePriorityTodo = () => {
-    const incompleteTodos = todos.filter((todo) => !todo.completed);
-    if (incompleteTodos.length > 0) {
-      const newPriorityTodo = incompleteTodos[0].text;
+  const updatePriorityTodo = useCallback(() => {
+    const today = new Date().toISOString().split("T")[0];
+    const incompleteTodosForToday = todos.filter(
+      (todo) => !todo.completed && todo.date === today
+    );
+
+    if (incompleteTodosForToday.length > 0) {
+      const newPriorityTodo = incompleteTodosForToday[0].text;
       setPriorityTodo(newPriorityTodo);
       onPriorityTodoChange(newPriorityTodo);
     } else {
       setPriorityTodo("");
       onPriorityTodoChange("");
     }
-  };
+  }, [todos, onPriorityTodoChange]);
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+    updatePriorityTodo();
+  }, [todos, updatePriorityTodo]);
 
   const [newTodo, setNewTodo] = useState("");
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
