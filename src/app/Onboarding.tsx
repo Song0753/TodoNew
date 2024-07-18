@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Background from "./Background";
-import Image from 'next/image';
+import Image from "next/image";
 
-const continueButtonPath = '/ContinueButton/ContinueButton.svg';
-const WelcomeStep = ({ onNext }) => {
-  const [nickname, setNickname] = useState("");
+const continueButtonPath = "/ContinueButton/ContinueButton.svg";
+const WelcomeStep = ({ onNext, initialName }) => {
+  const [nickname, setNickname] = useState(initialName);
   const [inputWidth, setInputWidth] = useState(320);
   const inputRef = useRef(null);
 
@@ -21,6 +21,7 @@ const WelcomeStep = ({ onNext }) => {
 
   const handleContinue = () => {
     if (nickname.trim()) {
+      localStorage.setItem("userName", nickname);
       onNext(nickname);
     }
   };
@@ -54,51 +55,63 @@ const WelcomeStep = ({ onNext }) => {
             text-center
           "
           style={{
-            outline: 'none',
-            boxShadow: 'none',
-            WebkitAppearance: 'none',
-            MozAppearance: 'none',
-            fontSize: '56px',
-            height: '80px',
+            outline: "none",
+            boxShadow: "none",
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+            fontSize: "56px",
+            height: "80px",
             width: `${inputWidth}px`,
-            minWidth: '320px',
-            maxWidth: '600px',
-            textAlign: 'center',
+            minWidth: "320px",
+            maxWidth: "600px",
+            textAlign: "center",
           }}
         />
       </div>
-      <div 
-  onClick={handleContinue}
-  className={`
+      <div
+        onClick={handleContinue}
+        className={`
     inline-block  // 인라인 블록으로 설정하여 내용물 크기에 맞춤
     cursor-pointer 
     transition-all duration-300 ease-in-out
     overflow-hidden  // 오버플로우 숨김
     rounded-[25px]
-    ${!nickname.trim() ? 'opacity-50' : 'hover:bg-white/20'}
+    ${!nickname.trim() ? "opacity-50" : "hover:bg-white/20"}
   `}
-  style={{
-    width: '200px',  // 이미지 너비와 일치
-    height: '50px',  // 이미지 높이와 일치
-  }}
->
-  <Image 
-    src="/ContinueButton/ContinueButton.svg"
-    alt="Continue"
-    width={200}
-    height={50}
-    layout="responsive"  // 반응형 레이아웃 사용
-  />
-</div>
+        style={{
+          width: "200px", // 이미지 너비와 일치
+          height: "50px", // 이미지 높이와 일치
+        }}
+      >
+        <Image
+          src="/ContinueButton/ContinueButton.svg"
+          alt="Continue"
+          width={200}
+          height={50}
+          layout="responsive" // 반응형 레이아웃 사용
+        />
+      </div>
     </div>
   );
 };
 
-const TodoStep = ({ onNext }) => {
-  const [todo, setTodo] = useState("");
+const TodoStep = ({ onNext, initialTodo }) => {
+  const [todo, setTodo] = useState(initialTodo);
+  const [inputWidth, setInputWidth] = useState(320);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    const calculateWidth = () => {
+      const textWidth = todo.length * 56; // 56px는 fontSize와 대략적으로 일치
+      return Math.max(320, Math.min(textWidth, 600));
+    };
+
+    setInputWidth(calculateWidth());
+  }, [todo]);
 
   const handleStart = () => {
     if (todo.trim()) {
+      localStorage.setItem("topPriority", todo);
       onNext(todo);
     }
   };
@@ -111,24 +124,65 @@ const TodoStep = ({ onNext }) => {
 
   return (
     <div className="space-y-4 text-center">
-      <h2 className="text-2xl font-bold text-white">
+      <h2 className="text-2xl text-white">
         What is your top priority to-do list?
       </h2>
-      <Input
-        type="text"
-        placeholder="Enter your top priority"
-        value={todo}
-        onKeyPress={handleKeyPress}
-        onChange={(e) => setTodo(e.target.value)}
-        className="bg-white/10 border-white/20 text-white placeholder-white/50"
-      />
-      <Button
-        onClick={() => onNext(todo)}
-        disabled={!todo.trim()}
-        className="bg-white/10 hover:bg-white/20 text-white"
+      <div className="relative flex justify-center">
+        <Input
+          ref={inputRef}
+          type="text"
+          placeholder="Enter your top priority"
+          value={todo}
+          onChange={(e) => setTodo(e.target.value)}
+          onKeyPress={handleKeyPress}
+          className="
+            bg-transparent 
+            border-0 border-b-2 border-white/50 
+            text-white placeholder-white/50 
+            focus:outline-none focus:ring-0 focus:border-white 
+            transition-all duration-300
+            px-0 py-4
+            rounded-none
+            custom-no-outline-input
+            text-center
+          "
+          style={{
+            outline: "none",
+            boxShadow: "none",
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+            fontSize: "28px",
+            height: "80px",
+            width: `${inputWidth}px`,
+            minWidth: "320px",
+            maxWidth: "600px",
+            textAlign: "center",
+          }}
+        />
+      </div>
+      <div
+        onClick={handleStart}
+        className={`
+          inline-block
+          cursor-pointer 
+          transition-all duration-300 ease-in-out
+          overflow-hidden
+          rounded-[25px]
+          ${!todo.trim() ? "opacity-50" : "hover:bg-white/20"}
+        `}
+        style={{
+          width: "200px",
+          height: "50px",
+        }}
       >
-        START
-      </Button>
+        <Image
+          src="/ContinueButton/ContinueButton.svg"
+          alt="Continue"
+          width={200}
+          height={50}
+          layout="responsive"
+        />
+      </div>
     </div>
   );
 };
@@ -159,6 +213,20 @@ const OnboardingFlow = ({ onComplete }) => {
   const [nickname, setNickname] = useState("");
   const [todo, setTodo] = useState("");
 
+  useEffect(() => {
+    const storedName = localStorage.getItem("userName");
+    const storedTodo = localStorage.getItem("topPriority");
+
+    if (storedName && storedTodo) {
+      setNickname(storedName);
+      setTodo(storedTodo);
+      setStep(2); // 모든 정보가 있으면 FinalStep으로
+    } else if (storedName) {
+      setNickname(storedName);
+      setStep(1); // userName만 있으면 TodoStep으로
+    }
+  }, []);
+
   const handleWelcomeNext = (name) => {
     setNickname(name);
     setStep(1);
@@ -170,16 +238,24 @@ const OnboardingFlow = ({ onComplete }) => {
   };
 
   const handleOpenTodoList = () => {
+    localStorage.removeItem("userName");
+    localStorage.removeItem("topPriority");
     onComplete(nickname, todo);
   };
 
   return (
     <Background>
       <div className="w-full max-w-md mx-auto">
-        {step === 0 && <WelcomeStep onNext={handleWelcomeNext} />}
-        {step === 1 && <TodoStep onNext={handleTodoNext} />}
+        {step === 0 && (
+          <WelcomeStep onNext={handleWelcomeNext} initialName={nickname} />
+        )}
+        {step === 1 && <TodoStep onNext={handleTodoNext} initialTodo={todo} />}
         {step === 2 && (
-          <FinalStep nickname={nickname} todo={todo} onComplete={onComplete} />
+          <FinalStep
+            nickname={nickname}
+            todo={todo}
+            onComplete={handleOpenTodoList}
+          />
         )}
       </div>
     </Background>
