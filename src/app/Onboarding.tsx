@@ -1,10 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Background from "./Background";
+import Image from 'next/image';
 
+const continueButtonPath = '/ContinueButton/ContinueButton.svg';
 const WelcomeStep = ({ onNext }) => {
   const [nickname, setNickname] = useState("");
+  const [inputWidth, setInputWidth] = useState(320);
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    const calculateWidth = () => {
+      const textWidth = nickname.length * 56; // 56px는 fontSize와 대략적으로 일치
+      return Math.max(320, Math.min(textWidth, 600));
+    };
+
+    setInputWidth(calculateWidth());
+  }, [nickname]);
 
   const handleContinue = () => {
     if (nickname.trim()) {
@@ -17,24 +30,66 @@ const WelcomeStep = ({ onNext }) => {
       handleContinue();
     }
   };
+
   return (
     <div className="space-y-4 text-center">
-      <h2 className="text-2xl font-bold text-white">Nice to meet you!</h2>
-      <Input
-        type="text"
-        placeholder="Enter your nickname"
-        value={nickname}
-        onChange={(e) => setNickname(e.target.value)}
-        onKeyPress={handleKeyPress}
-        className="bg-white/10 border-white/20 text-white placeholder-white/50"
-      />
-      <Button
-        onClick={handleContinue}
-        disabled={!nickname}
-        className="bg-white/10 hover:bg-white/20 text-white"
-      >
-        Continue
-      </Button>
+      <h2 className="text-2xl text-white">Nice to meet you!</h2>
+      <div className="relative flex justify-center">
+        <Input
+          ref={inputRef}
+          type="text"
+          placeholder="Google Nickname"
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          onKeyPress={handleKeyPress}
+          className="
+            bg-transparent 
+            border-0 border-b-2 border-white/50 
+            text-white placeholder-white/50 
+            focus:outline-none focus:ring-0 focus:border-white 
+            transition-all duration-300
+            px-0 py-4
+            rounded-none
+            custom-no-outline-input
+            text-center
+          "
+          style={{
+            outline: 'none',
+            boxShadow: 'none',
+            WebkitAppearance: 'none',
+            MozAppearance: 'none',
+            fontSize: '56px',
+            height: '80px',
+            width: `${inputWidth}px`,
+            minWidth: '320px',
+            maxWidth: '600px',
+            textAlign: 'center',
+          }}
+        />
+      </div>
+      <div 
+  onClick={handleContinue}
+  className={`
+    inline-block  // 인라인 블록으로 설정하여 내용물 크기에 맞춤
+    cursor-pointer 
+    transition-all duration-300 ease-in-out
+    overflow-hidden  // 오버플로우 숨김
+    rounded-[25px]
+    ${!nickname.trim() ? 'opacity-50' : 'hover:bg-white/20'}
+  `}
+  style={{
+    width: '200px',  // 이미지 너비와 일치
+    height: '50px',  // 이미지 높이와 일치
+  }}
+>
+  <Image 
+    src="/ContinueButton/ContinueButton.svg"
+    alt="Continue"
+    width={200}
+    height={50}
+    layout="responsive"  // 반응형 레이아웃 사용
+  />
+</div>
     </div>
   );
 };

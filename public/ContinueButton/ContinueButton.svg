@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="48" viewBox="0 0 192 48">
+    <g data-name="Continue button">
+        <g data-name="사각형 1116" style="stroke:#eee;stroke-width:2px;fill:none">
+            <rect width="192" height="48" rx="24" style="stroke:none"/>
+            <rect x="1" y="1" width="190" height="46" rx="23" style="fill:none"/>
+        </g>
+        <text transform="translate(59 30.999)" style="fill:#eee;font-size:18px;font-family:Pretendard Variable;font-weight:500"><tspan x="0" y="0">Continue</tspan></text>
+        <g transform="rotate(90 86 96)">
+            <path d="M0 13V0" transform="translate(14 8.182)" style="stroke-miterlimit:10;stroke:#eee;stroke-width:2px;fill:none"/>
+            <path data-name="Shape" d="M0 4.727 4.727 0l4.728 4.727" transform="translate(9.273 7.758)" style="stroke-linecap:square;stroke-miterlimit:10;stroke:#eee;stroke-width:2px;fill:none"/>
+            <circle cx="14" cy="14" r="14" style="stroke-linecap:square;stroke-miterlimit:10;stroke:#eee;stroke-width:2px;fill:none"/>
+        </g>
+    </g>
+</svg>
