@@ -13,23 +13,48 @@ export default function Home() {
   const [showTodoList, setShowTodoList] = useState(false);
 
   useEffect(() => {
-    const storedName = localStorage.getItem("userName");
-    const storedPriority = localStorage.getItem("topPriority");
-    if (storedName && storedPriority) {
-      setUserName(storedName);
-      setTopPriority(storedPriority);
-      setIsOnboardingComplete(true);
+    try {
+      const storedName = localStorage.getItem("userName");
+      const storedPriority = localStorage.getItem("topPriority");
+      console.log(
+        "Stored Name:",
+        storedName,
+        "Stored Priority:",
+        storedPriority
+      );
+
+      if (storedName && storedPriority) {
+        setUserName(storedName);
+        setTopPriority(storedPriority);
+        setIsOnboardingComplete(true);
+        // setShowTodoList(true);
+      }
+    } catch (error) {
+      console.error("Error accessing localStorage:", error);
+      // 오류 발생 시 사용자에게 알림을 표시하거나 대체 로직을 실행할 수 있습니다.
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    console.log("isOnboardingComplete:", isOnboardingComplete);
+    console.log("userName:", userName);
+    console.log("topPriority:", topPriority);
+  }, [isOnboardingComplete, userName, topPriority]);
+
   const handleOnboardingComplete = (name, priority) => {
-    setUserName(name);
-    setTopPriority(priority);
-    localStorage.setItem("userName", name);
-    localStorage.setItem("topPriority", priority);
-    setIsOnboardingComplete(true);
-    setShowTodoList(true);
+    try {
+      setUserName(name);
+      setTopPriority(priority);
+      localStorage.setItem("userName", name);
+      localStorage.setItem("topPriority", priority);
+      setIsOnboardingComplete(true);
+      setShowTodoList(true);
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+      // 오류 발생 시 사용자에게 알림을 표시할 수 있습니다.
+    }
   };
   const handlePriorityTodoChange = (newPriority) => {
     setTopPriority(newPriority);
