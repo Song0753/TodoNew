@@ -72,7 +72,17 @@ const AnalogClock = ({ currentTime }) => {
 
 function Clock() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isDigital, setIsDigital] = useState(true);
+  const [isDigital, setIsDigital] = useState(true); // 기본값을 true로 설정
+  const [isHovered, setIsHovered] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    const savedIsDigital = localStorage.getItem("clockIsDigital");
+    if (savedIsDigital !== null) {
+      setIsDigital(JSON.parse(savedIsDigital));
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -81,21 +91,47 @@ function Clock() {
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem("clockIsDigital", JSON.stringify(isDigital));
+    }
+  }, [isDigital, isClient]);
+
   const toggleClockType = () => {
     setIsDigital(!isDigital);
   };
 
+  if (!isClient) {
+    return null; // 또는 로딩 표시
+  }
+
   return (
-    <div className={styles.clockContainer}>
-      <button className={styles.chevronButton} onClick={toggleClockType}>
+    <div
+      className={styles.clockContainer}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <button
+        className={`${styles.chevronButton} ${styles.leftButton} ${
+          isHovered ? styles.visible : ""
+        }`}
+        onClick={toggleClockType}
+      >
         <ChevronLeft />
       </button>
-      {isDigital ? (
-        <DigitalClock currentTime={currentTime} />
-      ) : (
-        <AnalogClock currentTime={currentTime} />
-      )}
-      <button className={styles.chevronButton} onClick={toggleClockType}>
+      <div className={styles.clockWrapper}>
+        {isDigital ? (
+          <DigitalClock currentTime={currentTime} />
+        ) : (
+          <AnalogClock currentTime={currentTime} />
+        )}
+      </div>
+      <button
+        className={`${styles.chevronButton} ${styles.rightButton} ${
+          isHovered ? styles.visible : ""
+        }`}
+        onClick={toggleClockType}
+      >
         <ChevronRight />
       </button>
     </div>
