@@ -216,30 +216,40 @@ const OnboardingFlow = ({ onComplete }) => {
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
     const storedTodo = localStorage.getItem("topPriority");
+    const lastTodoStepDate = localStorage.getItem("lastTodoStepDate");
+    const today = new Date().toDateString();
 
-    if (storedName && storedTodo) {
+    if (storedName) {
       setNickname(storedName);
-      setTodo(storedTodo);
-      setStep(2); // 모든 정보가 있으면 FinalStep으로
-    } else if (storedName) {
-      setNickname(storedName);
-      setStep(1); // userName만 있으면 TodoStep으로
+      if (lastTodoStepDate === today) {
+        // TodoStep을 오늘 이미 실행했으면 FinalStep으로
+        setStep(2);
+      } else if (!storedTodo) {
+        // TodoStep을 오늘 실행하지 않았고, 저장된 todo가 없으면 TodoStep으로
+        setStep(1);
+      } else {
+        // 저장된 todo가 있으면 FinalStep으로
+        setTodo(storedTodo);
+        setStep(2);
+      }
     }
   }, []);
 
   const handleWelcomeNext = (name) => {
     setNickname(name);
+    localStorage.setItem("userName", name);
     setStep(1);
   };
 
   const handleTodoNext = (task) => {
     setTodo(task);
+    localStorage.setItem("topPriority", task);
+    // TodoStep 실행 날짜 저장
+    localStorage.setItem("lastTodoStepDate", new Date().toDateString());
     setStep(2);
   };
 
   const handleOpenTodoList = () => {
-    localStorage.removeItem("userName");
-    localStorage.removeItem("topPriority");
     onComplete(nickname, todo);
   };
 
