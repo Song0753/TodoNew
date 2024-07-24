@@ -29,45 +29,52 @@ export default function Home() {
       setIsOnboardingComplete(true);
     }
     if (storedTodos) {
-      setTodos(JSON.parse(storedTodos));
+      const parsedTodos = JSON.parse(storedTodos);
+      setTodos(parsedTodos);
+      updateTopPriority(parsedTodos);
     }
     setIsLoading(false);
   }, []);
 
-  const updateTopPriority = useCallback(() => {
-    const incompleteTodos = todos.filter((todo) => !todo.completed);
-    const newTopPriority =
-      incompleteTodos.length > 0 ? incompleteTodos[0].text : null;
+  const updateTopPriority = useCallback((currentTodos: Todo[]) => {
+    const incompleteTodos = currentTodos.filter(todo => !todo.completed);
+    const newTopPriority = incompleteTodos.length > 0 ? incompleteTodos[0].text : null;
     setTopPriority(newTopPriority);
-    setIsTopPriorityChecked(false); // Reset checkbox when top priority changes
-  }, [todos]);
+    setIsTopPriorityChecked(false);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
-    updateTopPriority();
+    updateTopPriority(todos);
   }, [todos, updateTopPriority]);
 
-  const handleOnboardingComplete = (name: string, priority: string) => {
+  const handleOnboardingComplete = (name: string, priority: string | null) => {
     setUserName(name);
-    setTodos([
-      {
-        id: Date.now().toString(),
-        text: priority,
-        completed: false,
-        date: new Date().toISOString().split("T")[0],
-      },
-    ]);
+    const newTodos = priority
+      ? [{ 
+          id: Date.now().toString(), 
+          text: priority, 
+          completed: false, 
+          date: new Date().toISOString().split('T')[0] 
+        }]
+      : [];
+    setTodos(newTodos);
+    updateTopPriority(newTodos);
     setIsOnboardingComplete(true);
     localStorage.setItem("userName", name);
   };
 
   const handleCompletePriority = () => {
-    const newTodos = todos.map((todo) =>
+    const newTodos = todos.map(todo => 
       todo.text === topPriority ? { ...todo, completed: true } : todo
     );
     setTodos(newTodos);
-    setIsTopPriorityChecked(true); // Set checkbox to checked
-    // The updateTopPriority in useEffect will handle updating to the next priority
+    setIsTopPriorityChecked(true);
+    updateTopPriority(newTodos);
+  };
+
+  const handleOpenTodoList = () => {
+    setShowTodoList(true);
   };
 
   if (isLoading) {
@@ -98,8 +105,9 @@ export default function Home() {
           userName={userName}
           topPriority={topPriority}
           isChecked={isTopPriorityChecked}
-          onOpenTodoList={() => setShowTodoList(true)}
+          onOpenTodoList={handleOpenTodoList}
           onCompletePriority={handleCompletePriority}
+          todos={todos}
         />
       )}
     </Background>

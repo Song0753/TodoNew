@@ -112,18 +112,18 @@ const TodoStep = ({ onNext, initialTodo }) => {
 
   useEffect(() => {
     // 컴포넌트가 마운트되면 자동으로 입력 필드에 포커스를 줍니다.
-    inputRef.current?.focus();
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   }, []);
 
   const handleStart = () => {
-    if (todo.trim()) {
-      localStorage.setItem("topPriority", todo);
-      onNext(todo);
-    }
+    // 빈 문자열이어도 다음 단계로 진행합니다.
+    onNext(todo.trim() || null);
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && todo.trim()) {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
       handleStart();
     }
   };
@@ -133,13 +133,18 @@ const TodoStep = ({ onNext, initialTodo }) => {
       <h2 className="text-2xl text-white">
         What is your top priority to-do list?
       </h2>
+      <p className="text-white text-sm">
+        (You can leave this blank and add tasks later)
+      </p>
       <div className="relative flex justify-center">
         <Input
           ref={inputRef}
           type="text"
-          placeholder="Enter your top priority"
+          placeholder="Enter your top priority (optional)"
           value={todo}
-          onChange={(e) => setTodo(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setTodo(e.target.value)
+          }
           onKeyPress={handleKeyPress}
           className="
             bg-transparent 
@@ -174,7 +179,7 @@ const TodoStep = ({ onNext, initialTodo }) => {
           transition-all duration-300 ease-in-out
           overflow-hidden
           rounded-[25px]
-          ${!todo.trim() ? "opacity-50" : "hover:bg-white/20"}
+          hover:bg-white/20
         `}
         style={{
           width: "200px",
@@ -208,42 +213,20 @@ const OnboardingFlow = ({ onComplete }) => {
 
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
-    const storedTodo = localStorage.getItem("topPriority");
-    const lastTodoStepDate = localStorage.getItem("lastTodoStepDate");
-    const today = new Date().toDateString();
-
     if (storedName) {
       setNickname(storedName);
-      if (lastTodoStepDate === today) {
-        // TodoStep을 오늘 이미 실행했으면 FinalStep으로
-        setStep(2);
-      } else if (!storedTodo) {
-        // TodoStep을 오늘 실행하지 않았고, 저장된 todo가 없으면 TodoStep으로
-        setStep(1);
-      } else {
-        // 저장된 todo가 있으면 FinalStep으로
-        setTodo(storedTodo);
-        setStep(2);
-      }
+      setStep(1); // TodoStep으로 바로 이동
     }
   }, []);
 
   const handleWelcomeNext = (name) => {
     setNickname(name);
-    localStorage.setItem("userName", name);
     setStep(1);
   };
 
   const handleTodoNext = (task) => {
     setTodo(task);
-    localStorage.setItem("topPriority", task);
-    // TodoStep 실행 날짜 저장
-    localStorage.setItem("lastTodoStepDate", new Date().toDateString());
-    setStep(2);
-  };
-
-  const handleOpenTodoList = () => {
-    onComplete(nickname, todo);
+    onComplete(nickname, task); // 바로 onComplete 호출
   };
 
   return (
@@ -253,13 +236,6 @@ const OnboardingFlow = ({ onComplete }) => {
           <WelcomeStep onNext={handleWelcomeNext} initialName={nickname} />
         )}
         {step === 1 && <TodoStep onNext={handleTodoNext} initialTodo={todo} />}
-        {step === 2 && (
-          <FinalStep
-            nickname={nickname}
-            todo={todo}
-            onComplete={handleOpenTodoList}
-          />
-        )}
       </div>
     </Background>
   );
