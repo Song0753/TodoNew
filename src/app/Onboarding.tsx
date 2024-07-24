@@ -99,16 +99,21 @@ const WelcomeStep = ({ onNext, initialName }) => {
 const TodoStep = ({ onNext, initialTodo }) => {
   const [todo, setTodo] = useState(initialTodo);
   const [inputWidth, setInputWidth] = useState(320);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const calculateWidth = () => {
-      const textWidth = todo.length * 56; // 56px는 fontSize와 대략적으로 일치
+      const textWidth = todo.length * 28; // 28px는 fontSize의 절반 정도로 설정
       return Math.max(320, Math.min(textWidth, 600));
     };
 
     setInputWidth(calculateWidth());
   }, [todo]);
+
+  useEffect(() => {
+    // 컴포넌트가 마운트되면 자동으로 입력 필드에 포커스를 줍니다.
+    inputRef.current?.focus();
+  }, []);
 
   const handleStart = () => {
     if (todo.trim()) {
