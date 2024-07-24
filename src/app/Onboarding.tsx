@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Background from "./Background";
 import Image from "next/image";
+import TopPriority from "./TopPriority";
 
 const continueButtonPath = "/ContinueButton/ContinueButton.svg";
 const WelcomeStep = ({ onNext, initialName }) => {
@@ -188,24 +189,11 @@ const TodoStep = ({ onNext, initialTodo }) => {
 };
 
 const FinalStep = ({ nickname, todo, onComplete }) => (
-  <div className="space-y-4 text-center">
-    <h2 className="text-2xl font-bold text-white">
-      Wishing you a delightful day! {nickname}
-    </h2>
-    <div className="flex items-center space-x-2 justify-center">
-      <input type="checkbox" checked readOnly className="border-white" />
-      <span className="text-white">{todo}</span>
-    </div>
-    <Button
-      onClick={(e) => {
-        e.preventDefault(); // 기본 동작 방지
-        onComplete(nickname, todo);
-      }}
-      className="bg-white/10 hover:bg-white/20 text-white"
-    >
-      Open Todo List
-    </Button>
-  </div>
+  <TopPriority
+    userName={nickname}
+    topPriority={todo}
+    onOpenTodoList={() => onComplete(nickname, todo)}
+  />
 );
 
 const OnboardingFlow = ({ onComplete }) => {

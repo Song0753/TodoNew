@@ -1,64 +1,73 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import TodoList from "./TodoList";
 import OnboardingFlow from "./Onboarding";
 import Background from "./Background";
-import { Button } from "@/components/ui/button";
+import TopPriority from "./TopPriority";
+
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+  date: string;
+}
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
   const [userName, setUserName] = useState("");
-  const [topPriority, setTopPriority] = useState("");
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [topPriority, setTopPriority] = useState<string | null>(null);
+  const [isTopPriorityChecked, setIsTopPriorityChecked] = useState(false);
   const [showTodoList, setShowTodoList] = useState(false);
 
   useEffect(() => {
-    try {
-      const storedName = localStorage.getItem("userName");
-      const storedPriority = localStorage.getItem("topPriority");
-      console.log(
-        "Stored Name:",
-        storedName,
-        "Stored Priority:",
-        storedPriority
-      );
-
-      if (storedName && storedPriority) {
-        setUserName(storedName);
-        setTopPriority(storedPriority);
-        setIsOnboardingComplete(true);
-        // setShowTodoList(true);
-      }
-    } catch (error) {
-      console.error("Error accessing localStorage:", error);
-      // 오류 발생 시 사용자에게 알림을 표시하거나 대체 로직을 실행할 수 있습니다.
-    } finally {
-      setIsLoading(false);
+    const storedName = localStorage.getItem("userName");
+    const storedTodos = localStorage.getItem("todos");
+    if (storedName) {
+      setUserName(storedName);
+      setIsOnboardingComplete(true);
     }
+    if (storedTodos) {
+      setTodos(JSON.parse(storedTodos));
+    }
+    setIsLoading(false);
   }, []);
 
-  useEffect(() => {
-    console.log("isOnboardingComplete:", isOnboardingComplete);
-    console.log("userName:", userName);
-    console.log("topPriority:", topPriority);
-  }, [isOnboardingComplete, userName, topPriority]);
+  const updateTopPriority = useCallback(() => {
+    const incompleteTodos = todos.filter((todo) => !todo.completed);
+    const newTopPriority =
+      incompleteTodos.length > 0 ? incompleteTodos[0].text : null;
+    setTopPriority(newTopPriority);
+    setIsTopPriorityChecked(false); // Reset checkbox when top priority changes
+  }, [todos]);
 
-  const handleOnboardingComplete = (name, priority) => {
-    try {
-      setUserName(name);
-      setTopPriority(priority);
-      localStorage.setItem("userName", name);
-      localStorage.setItem("topPriority", priority);
-      setIsOnboardingComplete(true);
-      setShowTodoList(true);
-    } catch (error) {
-      console.error("Error saving to localStorage:", error);
-      // 오류 발생 시 사용자에게 알림을 표시할 수 있습니다.
-    }
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+    updateTopPriority();
+  }, [todos, updateTopPriority]);
+
+  const handleOnboardingComplete = (name: string, priority: string) => {
+    setUserName(name);
+    setTodos([
+      {
+        id: Date.now().toString(),
+        text: priority,
+        completed: false,
+        date: new Date().toISOString().split("T")[0],
+      },
+    ]);
+    setIsOnboardingComplete(true);
+    localStorage.setItem("userName", name);
   };
-  const handlePriorityTodoChange = (newPriority) => {
-    setTopPriority(newPriority);
-    localStorage.setItem("topPriority", newPriority);
+
+  const handleCompletePriority = () => {
+    const newTodos = todos.map((todo) =>
+      todo.text === topPriority ? { ...todo, completed: true } : todo
+    );
+    setTodos(newTodos);
+    setIsTopPriorityChecked(true); // Set checkbox to checked
+    // The updateTopPriority in useEffect will handle updating to the next priority
   };
 
   if (isLoading) {
@@ -80,26 +89,18 @@ export default function Home() {
       {showTodoList ? (
         <TodoList
           userName={userName}
-          initialTodo={topPriority}
+          todos={todos}
           onClose={() => setShowTodoList(false)}
-          onPriorityTodoChange={handlePriorityTodoChange}
+          onTodosChange={setTodos}
         />
       ) : (
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-white">
-            Wishing you a delightful day! {userName}
-          </h1>
-          <div className="flex items-center justify-center space-x-2">
-            <input type="checkbox" checked readOnly className="border-white" />
-            <span className="text-white">{topPriority}</span>
-          </div>
-          <Button
-            onClick={() => setShowTodoList(true)}
-            className="bg-white/10 hover:bg-white/20 text-white"
-          >
-            Open Todo List
-          </Button>
-        </div>
+        <TopPriority
+          userName={userName}
+          topPriority={topPriority}
+          isChecked={isTopPriorityChecked}
+          onOpenTodoList={() => setShowTodoList(true)}
+          onCompletePriority={handleCompletePriority}
+        />
       )}
     </Background>
   );

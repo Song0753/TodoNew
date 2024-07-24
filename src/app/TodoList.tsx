@@ -23,58 +23,16 @@ interface Todo {
 interface TodoListProps {
   onClose: () => void;
   userName: string;
-  initialTodo: string;
-  onPriorityTodoChange: (newPriorityTodo: string) => void;
+  todos: Todo[];
+  onTodosChange: (newTodos: Todo[]) => void;
 }
 
 const TodoList: React.FC<TodoListProps> = ({
   onClose,
   userName,
-  initialTodo,
-  onPriorityTodoChange,
+  todos,
+  onTodosChange,
 }) => {
-  const [todos, setTodos] = useState<Todo[]>(() => {
-    // Initialize todos from localStorage
-    const storedTodos = localStorage.getItem("todos");
-    if (storedTodos) {
-      return JSON.parse(storedTodos);
-    }
-    // 초기 할 일 추가
-    if (initialTodo) {
-      return [
-        {
-          id: Date.now().toString(),
-          text: initialTodo,
-          completed: false,
-          date: new Date().toISOString().split("T")[0],
-        },
-      ];
-    }
-    return [];
-  });
-  const [priorityTodo, setPriorityTodo] = useState<string>(initialTodo);
-
-  const updatePriorityTodo = useCallback(() => {
-    const today = new Date().toISOString().split("T")[0];
-    const incompleteTodosForToday = todos.filter(
-      (todo) => !todo.completed && todo.date === today
-    );
-
-    if (incompleteTodosForToday.length > 0) {
-      const newPriorityTodo = incompleteTodosForToday[0].text;
-      setPriorityTodo(newPriorityTodo);
-      onPriorityTodoChange(newPriorityTodo);
-    } else {
-      setPriorityTodo("");
-      onPriorityTodoChange("");
-    }
-  }, [todos, onPriorityTodoChange]);
-
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-    updatePriorityTodo();
-  }, [todos, updatePriorityTodo]);
-
   const [newTodo, setNewTodo] = useState("");
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
@@ -83,28 +41,24 @@ const TodoList: React.FC<TodoListProps> = ({
     return new Date(today.setDate(diff));
   });
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
-
-  useEffect(() => {
-    // Save todos to localStorage whenever it changes
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
 
   const addTodo = useCallback(() => {
     if (newTodo.trim() !== "") {
-      setTodos((prevTodos) => [
-        ...prevTodos,
+      const newTodos = [
+        ...todos,
         {
           id: Date.now().toString(),
           text: newTodo,
           completed: false,
           date: selectedDate.toISOString().split("T")[0],
         },
-      ]);
+      ];
+      onTodosChange(newTodos);
       setNewTodo("");
     }
-  }, [newTodo, selectedDate]);
+  }, [newTodo, selectedDate, todos, onTodosChange]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -113,12 +67,12 @@ const TodoList: React.FC<TodoListProps> = ({
   };
 
   const toggleTodo = (id: string) => {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
+    const newTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
     );
+    onTodosChange(newTodos);
   };
+
   const startEditing = (id: string, text: string) => {
     setEditingId(id);
     setEditText(text);
@@ -126,11 +80,10 @@ const TodoList: React.FC<TodoListProps> = ({
 
   const saveEdit = () => {
     if (editingId === null) return;
-    setTodos(
-      todos.map((todo) =>
-        todo.id === editingId ? { ...todo, text: editText } : todo
-      )
+    const newTodos = todos.map((todo) =>
+      todo.id === editingId ? { ...todo, text: editText } : todo
     );
+    onTodosChange(newTodos);
     setEditingId(null);
   };
 
@@ -139,7 +92,8 @@ const TodoList: React.FC<TodoListProps> = ({
   };
 
   const deleteTodo = (id: string) => {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+    const newTodos = todos.filter((todo) => todo.id !== id);
+    onTodosChange(newTodos);
   };
 
   const changeWeek = (weeks: number) => {
@@ -176,11 +130,18 @@ const TodoList: React.FC<TodoListProps> = ({
       return;
     }
 
-    const newTodos = Array.from(todos);
-    const [reorderedItem] = newTodos.splice(result.source.index, 1);
-    newTodos.splice(result.destination.index, 0, reorderedItem);
+    const sourceIndex = todos.findIndex(
+      (todo) => todo.id === filteredTodos[result.source.index].id
+    );
+    const destinationIndex = todos.findIndex(
+      (todo) => todo.id === filteredTodos[result.destination.index].id
+    );
 
-    setTodos(newTodos);
+    const newTodos = Array.from(todos);
+    const [reorderedItem] = newTodos.splice(sourceIndex, 1);
+    newTodos.splice(destinationIndex, 0, reorderedItem);
+
+    onTodosChange(newTodos);
   };
 
   return (
