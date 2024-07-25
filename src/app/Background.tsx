@@ -12,10 +12,14 @@ const backgroundImages = [
   // Add more image paths as needed
 ];
 
-const Background = ({ children }: { children: React.ReactNode }) => {
+interface BackgroundProps {
+  children: React.ReactNode;
+  overlayOpacity: number;
+}
+
+const Background: React.FC<BackgroundProps> = ({ children, overlayOpacity }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [nextImageIndex, setNextImageIndex] = useState(1);
-  const [overlayOpacity, setOverlayOpacity] = useState(0.2);
 
   useEffect(() => {
     const preloadImage = (index: number) => {
@@ -58,18 +62,6 @@ const Background = ({ children }: { children: React.ReactNode }) => {
           <Clock />
         </div>
         <div className={styles.childrenContainer}>{children}</div>
-        <div className={styles.sliderContainer}>
-          <Slider
-            value={[overlayOpacity]}
-            min={0}
-            max={1}
-            step={0.01}
-            onValueChange={([value]) => setOverlayOpacity(value)}
-          />
-          <p className={styles.sliderLabel}>
-            Overlay Opacity: {Math.round(overlayOpacity * 100)}%
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -21,6 +21,7 @@ export default function Home() {
   const [topPriority, setTopPriority] = useState<string | null>(null);
   const [isTopPriorityChecked, setIsTopPriorityChecked] = useState(false);
   const [showTodoList, setShowTodoList] = useState(false);
+  const [overlayOpacity, setOverlayOpacity] = useState(0.2);
 
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
@@ -81,6 +82,10 @@ export default function Home() {
     setShowTodoList(true);
   };
 
+  const handleOverlayOpacityChange = (newOpacity: number) => {
+    setOverlayOpacity(newOpacity);
+  };
+
   if (isLoading) {
     return (
       <Background>
@@ -96,7 +101,7 @@ export default function Home() {
   }
 
   return (
-    <Background>
+    <Background overlayOpacity={overlayOpacity}>
       {showTodoList ? (
         <TodoList
           userName={userName}
@@ -114,7 +119,10 @@ export default function Home() {
           todos={todos}
         />
       )}
-      <Settings />
+      <Settings 
+        overlayOpacity={overlayOpacity} 
+        onOverlayOpacityChange={handleOverlayOpacityChange}
+      />
     </Background>
   );
 }
