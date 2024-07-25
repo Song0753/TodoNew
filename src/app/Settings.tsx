@@ -60,10 +60,6 @@ const Settings: React.FC<SettingsProps> = ({
               />
             </div>
           </DropdownMenuItem>
-          <DropdownMenuItem className="focus:bg-gray-100 rounded px-2 py-1">Profile</DropdownMenuItem>
-          <DropdownMenuItem className="focus:bg-gray-100 rounded px-2 py-1">Preferences</DropdownMenuItem>
-          <DropdownMenuItem className="focus:bg-gray-100 rounded px-2 py-1">Help</DropdownMenuItem>
-          <DropdownMenuItem className="focus:bg-gray-100 rounded px-2 py-1">Log out</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

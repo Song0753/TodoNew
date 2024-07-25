@@ -28,6 +28,9 @@ export default function Home() {
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
     const storedTodos = localStorage.getItem("todos");
+    const storedOverlayOpacity = localStorage.getItem("overlayOpacity");
+    const storedIsSearchVisible = localStorage.getItem("isSearchVisible");
+
     if (storedName) {
       setUserName(storedName);
       setIsOnboardingComplete(true);
@@ -37,13 +40,19 @@ export default function Home() {
       setTodos(parsedTodos);
       updateTopPriority(parsedTodos);
     }
+    if (storedOverlayOpacity) {
+      setOverlayOpacity(parseFloat(storedOverlayOpacity));
+    }
+    if (storedIsSearchVisible) {
+      setIsSearchVisible(storedIsSearchVisible === "true");
+    }
     setIsLoading(false);
   }, []);
 
   const updateTopPriority = useCallback((currentTodos: Todo[]) => {
-    const incompleteTodos = currentTodos.filter((todo) => !todo.completed);
-    const newTopPriority =
-      incompleteTodos.length > 0 ? incompleteTodos[0].text : null;
+    const today = new Date().toISOString().split('T')[0];
+    const incompleteTodos = currentTodos.filter(todo => !todo.completed && todo.date === today);
+    const newTopPriority = incompleteTodos.length > 0 ? incompleteTodos[0].text : null;
     setTopPriority(newTopPriority);
     setIsTopPriorityChecked(false);
   }, []);
@@ -56,14 +65,12 @@ export default function Home() {
   const handleOnboardingComplete = (name: string, priority: string | null) => {
     setUserName(name);
     const newTodos = priority
-      ? [
-          {
-            id: Date.now().toString(),
-            text: priority,
-            completed: false,
-            date: new Date().toISOString().split("T")[0],
-          },
-        ]
+      ? [{ 
+          id: Date.now().toString(), 
+          text: priority, 
+          completed: false, 
+          date: new Date().toISOString().split('T')[0] 
+        }]
       : [];
     setTodos(newTodos);
     updateTopPriority(newTodos);
@@ -72,7 +79,7 @@ export default function Home() {
   };
 
   const handleCompletePriority = () => {
-    const newTodos = todos.map((todo) =>
+    const newTodos = todos.map(todo => 
       todo.text === topPriority ? { ...todo, completed: true } : todo
     );
     setTodos(newTodos);
@@ -86,15 +93,18 @@ export default function Home() {
 
   const handleOverlayOpacityChange = (newOpacity: number) => {
     setOverlayOpacity(newOpacity);
+    localStorage.setItem("overlayOpacity", newOpacity.toString());
   };
 
   const toggleSearchVisibility = () => {
-    setIsSearchVisible(!isSearchVisible);
+    const newIsSearchVisible = !isSearchVisible;
+    setIsSearchVisible(newIsSearchVisible);
+    localStorage.setItem("isSearchVisible", newIsSearchVisible.toString());
   };
 
   if (isLoading) {
     return (
-      <Background>
+      <Background overlayOpacity={overlayOpacity}>
         <div className="flex items-center justify-center h-screen">
           <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
         </div>
