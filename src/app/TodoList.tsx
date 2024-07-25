@@ -9,9 +9,11 @@ import {
   Trash2,
   Check,
   GripVertical,
+  Flower,
 } from "lucide-react";
 import styles from "./TodoList.module.css";
 import { Checkbox } from "@/components/ui/checkbox";
+import Image from "next/image";
 
 interface Todo {
   id: string;
@@ -198,85 +200,98 @@ const TodoList: React.FC<TodoListProps> = ({
                   ref={provided.innerRef}
                   className={styles.todoList}
                 >
-                  {filteredTodos.map((todo, index) => (
-                    <Draggable
-                      key={todo.id}
-                      draggableId={todo.id}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={styles.todoItem}
-                        >
-                          <div className={styles.dragHandle}>
-                            <GripVertical size={20} />
-                          </div>
-                          <div className={styles.todoItemContent}>
-                            <Checkbox
-                              checked={todo.completed}
-                              onCheckedChange={() => toggleTodo(todo.id)}
-                              className={`${styles.transparentCheckbox} ${styles.customCheckbox}`}
-                            />
-                            {editingId === todo.id ? (
-                              <input
-                                type="text"
-                                value={editText}
-                                onChange={(e) => setEditText(e.target.value)}
-                                className={styles.editInput}
-                                autoFocus
+                  {filteredTodos.length > 0 ? (
+                    filteredTodos.map((todo, index) => (
+                      <Draggable
+                        key={todo.id}
+                        draggableId={todo.id}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className={styles.todoItem}
+                          >
+                            <div className={styles.dragHandle}>
+                              <GripVertical size={20} />
+                            </div>
+                            <div className={styles.todoItemContent}>
+                              <Checkbox
+                                checked={todo.completed}
+                                onCheckedChange={() => toggleTodo(todo.id)}
+                                className={`${styles.transparentCheckbox} ${styles.customCheckbox}`}
                               />
-                            ) : (
-                              <span
-                                className={`${styles.todoText} ${
-                                  todo.completed ? styles.completedTodo : ""
-                                }`}
-                              >
-                                {todo.text}
-                              </span>
-                            )}
+                              {editingId === todo.id ? (
+                                <input
+                                  type="text"
+                                  value={editText}
+                                  onChange={(e) => setEditText(e.target.value)}
+                                  className={styles.editInput}
+                                  autoFocus
+                                />
+                              ) : (
+                                <span
+                                  className={`${styles.todoText} ${
+                                    todo.completed ? styles.completedTodo : ""
+                                  }`}
+                                >
+                                  {todo.text}
+                                </span>
+                              )}
+                            </div>
+                            <div className={styles.todoActions}>
+                              {editingId === todo.id ? (
+                                <>
+                                  <button
+                                    className={styles.actionButton}
+                                    onClick={saveEdit}
+                                  >
+                                    <Check size={20} />
+                                  </button>
+                                  <button
+                                    className={styles.actionButton}
+                                    onClick={cancelEdit}
+                                  >
+                                    <X size={20} />
+                                  </button>
+                                </>
+                              ) : (
+                                <>
+                                  <button
+                                    className={styles.actionButton}
+                                    onClick={() =>
+                                      startEditing(todo.id, todo.text)
+                                    }
+                                  >
+                                    <Edit size={20} />
+                                  </button>
+                                  <button
+                                    className={styles.actionButton}
+                                    onClick={() => deleteTodo(todo.id)}
+                                  >
+                                    <Trash2 size={20} />
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <div className={styles.todoActions}>
-                            {editingId === todo.id ? (
-                              <>
-                                <button
-                                  className={styles.actionButton}
-                                  onClick={saveEdit}
-                                >
-                                  <Check size={20} />
-                                </button>
-                                <button
-                                  className={styles.actionButton}
-                                  onClick={cancelEdit}
-                                >
-                                  <X size={20} />
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <button
-                                  className={styles.actionButton}
-                                  onClick={() =>
-                                    startEditing(todo.id, todo.text)
-                                  }
-                                >
-                                  <Edit size={20} />
-                                </button>
-                                <button
-                                  className={styles.actionButton}
-                                  onClick={() => deleteTodo(todo.id)}
-                                >
-                                  <Trash2 size={20} />
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
+                        )}
+                      </Draggable>
+                    ))
+                  ) : (
+                    <div className={styles.emptyTodoList}>
+                      <Image
+                        src="/flower/iconmonstr-flower-3.svg"
+                        alt="Flower icon"
+                        width={48}
+                        height={48}
+                        className={styles.flowerIcon}
+                      />
+                      <p>Add New Task</p>
+                    </div>
+                  )}
                   {provided.placeholder}
                 </div>
               )}

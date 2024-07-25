@@ -109,7 +109,6 @@
   align-items: center;
 }
 
-
 .dragHandle:active {
   cursor: grabbing;
 }
@@ -136,7 +135,6 @@
   flex-grow: 1;
   padding-left: 0.5rem;
 }
-
 
 .transparentCheckbox {
   background-color: transparent !important;
@@ -232,4 +230,18 @@
 
 .addTodoButton:hover {
   background-color: #5a5a5a;
+}
+
+.emptyTodoList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #888;
+}
+
+.flowerIcon {
+  margin-bottom: 1rem;
+  color: #888;
 }
