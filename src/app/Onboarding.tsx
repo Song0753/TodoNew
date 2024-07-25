@@ -103,7 +103,7 @@ const TodoStep = ({ onNext, initialTodo }) => {
 
   useEffect(() => {
     const calculateWidth = () => {
-      const textWidth = todo.length * 28; // 28px는 fontSize의 절반 정도로 설정
+      const textWidth = todo.length * 28;
       return Math.max(320, Math.min(textWidth, 600));
     };
 
@@ -111,14 +111,12 @@ const TodoStep = ({ onNext, initialTodo }) => {
   }, [todo]);
 
   useEffect(() => {
-    // 컴포넌트가 마운트되면 자동으로 입력 필드에 포커스를 줍니다.
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
 
   const handleStart = () => {
-    // 빈 문자열이어도 다음 단계로 진행합니다.
     onNext(todo.trim() || null);
   };
 
@@ -131,7 +129,7 @@ const TodoStep = ({ onNext, initialTodo }) => {
   return (
     <div className="space-y-4 text-center">
       <h2 className="text-2xl text-white">
-        What is your top priority to-do list?
+        What is your top priority to-do list for today?
       </h2>
       <p className="text-white text-sm">
         (You can leave this blank and add tasks later)
@@ -140,7 +138,7 @@ const TodoStep = ({ onNext, initialTodo }) => {
         <Input
           ref={inputRef}
           type="text"
-          placeholder="Enter your top priority (optional)"
+          placeholder="Enter your top priority for today (optional)"
           value={todo}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setTodo(e.target.value)
@@ -213,24 +211,34 @@ const OnboardingFlow = ({ onComplete }) => {
 
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
+    const storedTodoDate = localStorage.getItem("lastTodoDate");
+    const today = new Date().toISOString().split("T")[0];
+
     if (storedName) {
       setNickname(storedName);
-      setStep(1); // TodoStep으로 바로 이동
+      if (storedTodoDate !== today) {
+        setStep(1); // TodoStep으로 이동
+      } else {
+        onComplete(storedName, null); // 오늘 이미 할 일을 입력했다면 온보딩 완료
+      }
     }
-  }, []);
+  }, [onComplete]);
 
   const handleWelcomeNext = (name) => {
     setNickname(name);
+    localStorage.setItem("userName", name);
     setStep(1);
   };
 
   const handleTodoNext = (task) => {
     setTodo(task);
-    onComplete(nickname, task); // 바로 onComplete 호출
+    const today = new Date().toISOString().split("T")[0];
+    localStorage.setItem("lastTodoDate", today);
+    onComplete(nickname, task);
   };
 
   return (
-    <Background overlayOpacity={0.2} showClock={true}>
+    <Background overlayOpacity={0.5} showClock={true}>
       <div className="w-full max-w-md mx-auto">
         {step === 0 && (
           <WelcomeStep onNext={handleWelcomeNext} initialName={nickname} />

@@ -2,13 +2,20 @@ import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
 
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+  date: string;
+}
+
 interface TopPriorityProps {
   userName: string;
   topPriority: string | null;
   isChecked: boolean;
   onOpenTodoList: () => void;
   onCompletePriority: () => void;
-  todos?: { id: string; text: string; completed: boolean }[];
+  todos: Todo[];
 }
 
 const TopPriority: React.FC<TopPriorityProps> = ({
@@ -17,11 +24,14 @@ const TopPriority: React.FC<TopPriorityProps> = ({
   isChecked,
   onOpenTodoList,
   onCompletePriority,
-  todos = [],
+  todos,
 }) => {
+  const today = new Date().toISOString().split("T")[0];
+  const todayTodos = todos.filter((todo) => todo.date === today);
+
   const allTodosCompleted =
-    todos.length > 0 && todos.every((todo) => todo.completed);
-  const noTodos = todos.length === 0;
+    todayTodos.length > 0 && todayTodos.every((todo) => todo.completed);
+  const noTodosToday = todayTodos.length === 0;
 
   return (
     <div className="text-center space-y-4">
@@ -30,9 +40,9 @@ const TopPriority: React.FC<TopPriorityProps> = ({
       </h1>
       <div className="flex items-center justify-center space-x-4">
         <div className="flex-grow">
-          {noTodos ? (
+          {noTodosToday ? (
             <p className="text-white text-2xl">
-              You have no tasks. Click the button to add some!
+              You have no tasks for today. Click the button to add some!
             </p>
           ) : allTodosCompleted ? (
             <p className="text-white text-2xl">
@@ -53,7 +63,11 @@ const TopPriority: React.FC<TopPriorityProps> = ({
                 {topPriority}
               </label>
             </div>
-          ) : null}
+          ) : (
+            <p className="text-white text-2xl">
+              You have tasks for today. Keep going!
+            </p>
+          )}
         </div>
         <div
           onClick={onOpenTodoList}
