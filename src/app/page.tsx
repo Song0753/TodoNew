@@ -5,6 +5,7 @@ import OnboardingFlow from "./Onboarding";
 import Background from "./Background";
 import TopPriority from "./TopPriority";
 import Settings from "./Settings";
+import GoogleSearch from "./GoogleSearch";
 
 interface Todo {
   id: string;
@@ -22,6 +23,7 @@ export default function Home() {
   const [isTopPriorityChecked, setIsTopPriorityChecked] = useState(false);
   const [showTodoList, setShowTodoList] = useState(false);
   const [overlayOpacity, setOverlayOpacity] = useState(0.2);
+  const [isSearchVisible, setIsSearchVisible] = useState(true);
 
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
@@ -86,6 +88,10 @@ export default function Home() {
     setOverlayOpacity(newOpacity);
   };
 
+  const toggleSearchVisibility = () => {
+    setIsSearchVisible(!isSearchVisible);
+  };
+
   if (isLoading) {
     return (
       <Background>
@@ -122,7 +128,10 @@ export default function Home() {
       <Settings 
         overlayOpacity={overlayOpacity} 
         onOverlayOpacityChange={handleOverlayOpacityChange}
+        isSearchVisible={isSearchVisible}
+        onToggleSearchVisibility={toggleSearchVisibility}
       />
+      <GoogleSearch isVisible={isSearchVisible} />
     </Background>
   );
 }

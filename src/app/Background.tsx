@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Clock from "./Clock";
-import { Slider } from "@/components/ui/slider";
 import styles from "./Background.module.css";
 
 const backgroundImages = [
@@ -14,10 +13,15 @@ const backgroundImages = [
 
 interface BackgroundProps {
   children: React.ReactNode;
-  overlayOpacity: number;
+  overlayOpacity?: number;
+  showClock?: boolean;
 }
 
-const Background: React.FC<BackgroundProps> = ({ children, overlayOpacity }) => {
+const Background: React.FC<BackgroundProps> = ({ 
+  children, 
+  overlayOpacity = 0.2,
+  showClock = true 
+}) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [nextImageIndex, setNextImageIndex] = useState(1);
 
@@ -58,9 +62,11 @@ const Background: React.FC<BackgroundProps> = ({ children, overlayOpacity }) => 
       />
       <div className={styles.overlay} style={{ opacity: overlayOpacity }} />
       <div className={styles.content}>
-        <div className={styles.clockContainer}>
-          <Clock />
-        </div>
+        {showClock && (
+          <div className={styles.clockContainer}>
+            <Clock />
+          </div>
+        )}
         <div className={styles.childrenContainer}>{children}</div>
       </div>
     </div>

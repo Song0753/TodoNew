@@ -230,7 +230,7 @@ const OnboardingFlow = ({ onComplete }) => {
   };
 
   return (
-    <Background>
+    <Background overlayOpacity={0.2} showClock={true}>
       <div className="w-full max-w-md mx-auto">
         {step === 0 && (
           <WelcomeStep onNext={handleWelcomeNext} initialName={nickname} />
