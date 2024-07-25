@@ -4,6 +4,7 @@ import TodoList from "./TodoList";
 import OnboardingFlow from "./Onboarding";
 import Background from "./Background";
 import TopPriority from "./TopPriority";
+import Settings from "./Settings";
 
 interface Todo {
   id: string;
@@ -37,8 +38,9 @@ export default function Home() {
   }, []);
 
   const updateTopPriority = useCallback((currentTodos: Todo[]) => {
-    const incompleteTodos = currentTodos.filter(todo => !todo.completed);
-    const newTopPriority = incompleteTodos.length > 0 ? incompleteTodos[0].text : null;
+    const incompleteTodos = currentTodos.filter((todo) => !todo.completed);
+    const newTopPriority =
+      incompleteTodos.length > 0 ? incompleteTodos[0].text : null;
     setTopPriority(newTopPriority);
     setIsTopPriorityChecked(false);
   }, []);
@@ -51,12 +53,14 @@ export default function Home() {
   const handleOnboardingComplete = (name: string, priority: string | null) => {
     setUserName(name);
     const newTodos = priority
-      ? [{ 
-          id: Date.now().toString(), 
-          text: priority, 
-          completed: false, 
-          date: new Date().toISOString().split('T')[0] 
-        }]
+      ? [
+          {
+            id: Date.now().toString(),
+            text: priority,
+            completed: false,
+            date: new Date().toISOString().split("T")[0],
+          },
+        ]
       : [];
     setTodos(newTodos);
     updateTopPriority(newTodos);
@@ -65,7 +69,7 @@ export default function Home() {
   };
 
   const handleCompletePriority = () => {
-    const newTodos = todos.map(todo => 
+    const newTodos = todos.map((todo) =>
       todo.text === topPriority ? { ...todo, completed: true } : todo
     );
     setTodos(newTodos);
@@ -110,6 +114,7 @@ export default function Home() {
           todos={todos}
         />
       )}
+      <Settings />
     </Background>
   );
 }
